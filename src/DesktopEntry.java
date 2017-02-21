@@ -5,6 +5,7 @@ import java.util.ArrayList;
  * Created by kevin on 11/12/16.
  */
 public class DesktopEntry {
+    //TODO: Add support for more fields, such as "Comment", and maybe add support for renaming desktop entries altogether
     private File desktopFile;
     boolean parsed;
     private String name;
@@ -47,7 +48,7 @@ public class DesktopEntry {
                     name = line.substring(line.indexOf("=") + 1);
                     named = true;
                 }
-                if (line.startsWith("noDisplay"))
+                if (line.startsWith("NoDisplay"))
                     if (line.contains("true"))
                         noDisplay = true;
                 if (line.startsWith("Icon"))
@@ -78,36 +79,229 @@ public class DesktopEntry {
 
     public void setName (String newName)
     {
+        final String constant = "Name=";
         try
         {
-            //init file writers
-            FileWriter writer = new FileWriter(desktopFile);
-            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            String writeBuffer = "";
             //read the desktop file
             FileReader reader = new FileReader(desktopFile);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
-            boolean named = false;
+
+            boolean written = false;
             String line = null;
+            boolean firstLine = true;
 
             //go over each line and see if it matters
             while ((line = bufferedReader.readLine()) != null)
             {
-                if (line.startsWith("Name=") && !named)
+                System.out.println(line);
+                if (!firstLine)
+                    writeBuffer = writeBuffer + "\n";
+                if (line.startsWith(constant) && !written)
                 {
-                    named = true;
-                    writer.write("Name=" + newName);
+                    written = true;
+                    writeBuffer = writeBuffer + constant + newName;
                 }
                 else
                 {
-                    writer.write("ayy");
+                    writeBuffer = writeBuffer + line;
                 }
+                firstLine = false;
             }
             //close the readers
             bufferedReader.close();
             reader.close();
-            bufferedWriter.close();
+            System.out.println("Write buffer:");
+            System.out.println("\n WRITE BUFFER \n" + writeBuffer);
+            //init file writer
+            FileWriter writer = new FileWriter(desktopFile);
+            //write the buffer
+            if (writeBuffer.startsWith("[Desktop Entry]") == false)
+                writeBuffer = "[Desktop Entry]" + writeBuffer;
+            if (!written)
+            {
+                writer.write("[Desktop Entry]\n" + constant + newName);
+                writer.append(writeBuffer.substring(writeBuffer.indexOf("[Desktop Entry]") + 15));
+            }
+            else
+                writer.write(writeBuffer);
             writer.close();
+            name = newName;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void setNoDisplay (boolean newNoDisplay)
+    {
+        final String constant = "NoDisplay";
+        try
+        {
+            String writeBuffer = "";
+            //read the desktop file
+            FileReader reader = new FileReader(desktopFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+
+            boolean written = false;
+            String line = null;
+            boolean firstLine = true;
+
+            //go over each line and see if it matters
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                if (!firstLine)
+                    writeBuffer = writeBuffer + "\n";
+                if (line.startsWith(constant) && !written)
+                {
+                    written = true;
+                    writeBuffer = writeBuffer + constant + "=" + newNoDisplay;
+                }
+                else
+                {
+                    writeBuffer = writeBuffer + line;
+                }
+                firstLine = false;
+            }
+            //close the readers
+            bufferedReader.close();
+            reader.close();
+
+            //init file writer
+            FileWriter writer = new FileWriter(desktopFile);
+            //write the buffer
+            if (!written)
+            {
+                writer.write("[Desktop Entry]\n" + constant + "=" + newNoDisplay);
+                writer.append(writeBuffer.substring(writeBuffer.indexOf("[Desktop Entry]") + 15));
+            }
+            else
+                writer.write(writeBuffer);
+            writer.close();
+
+            noDisplay = newNoDisplay;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void setCategories (ArrayList<String> newCategories)
+    {
+        final String constant = "Categories";
+        try
+        {
+            String writeBuffer = "";
+            //read the desktop file
+            FileReader reader = new FileReader(desktopFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+
+            boolean written = false;
+            String line = null;
+            boolean firstLine = true;
+
+            //go over each line and see if it matters
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                if (!firstLine)
+                    writeBuffer = writeBuffer + "\n";
+                if (line.startsWith(constant) && !written)
+                {
+                    written = true;
+                    writeBuffer = writeBuffer + constant + "=";
+                    for (String s : newCategories)
+                    {
+                        System.out.println(s);
+                        writeBuffer = writeBuffer + s + ";";
+                    }
+                }
+                else
+                {
+                    writeBuffer = writeBuffer + line;
+                }
+                firstLine = false;
+            }
+            //close the readers
+            bufferedReader.close();
+            reader.close();
+
+            //init file writer
+            FileWriter writer = new FileWriter(desktopFile);
+            //write the buffer
+            if (!written)
+            {
+                writer.write("[Desktop Entry]\n" + constant + "=");
+                for (String s : categories)
+                {
+                    writer.write(s + ";");
+                }
+                writer.append(writeBuffer.substring(writeBuffer.indexOf("[Desktop Entry]") + 15));
+            }
+            else
+                writer.write(writeBuffer);
+            writer.close();
+
+            categories = newCategories;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void setIcon (String newIcon)
+    {
+        final String constant = "Icon";
+        try
+        {
+            String writeBuffer = "";
+            //read the desktop file
+            FileReader reader = new FileReader(desktopFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+
+            boolean written = false;
+            String line = null;
+            boolean firstLine = true;
+
+            //go over each line and see if it matters
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                System.out.println(line);
+                if (!firstLine)
+                    writeBuffer = writeBuffer + "\n";
+                if (line.startsWith(constant) && !written)
+                {
+                    written = true;
+                    writeBuffer = writeBuffer + constant + "=" + newIcon;
+                }
+                else
+                {
+                    writeBuffer = writeBuffer + line;
+                }
+                firstLine = false;
+            }
+            //close the readers
+            bufferedReader.close();
+            reader.close();
+            //init file writer
+            FileWriter writer = new FileWriter(desktopFile);
+            //write the buffer
+            if (!written)
+            {
+                writer.write("[Desktop Entry]\n" + constant + "=" + newIcon);
+                writer.append(writeBuffer.substring(writeBuffer.indexOf("[Desktop Entry]") + 15));
+            }
+            else
+                writer.write(writeBuffer);
+            writer.close();
+
+            icon = newIcon;
         }
         catch (Exception e)
         {
@@ -145,6 +339,11 @@ public class DesktopEntry {
         return categories.get(index);
     }
 
+    public int getNumCategories()
+    {
+        return categories.size();
+    }
+
     public int hasCategory(String category) //if the category is found, return the index, otherwise, return -1
     {
         if (categories.contains(category))
@@ -158,8 +357,7 @@ public class DesktopEntry {
         return icon;
     }
 
-    @Override
-    public String toString()
+    public String printDebug()
     {
         String theCategories = "";
         for (int i = 0; i < categories.size(); i++)
@@ -169,5 +367,11 @@ public class DesktopEntry {
                 theCategories = theCategories + ", ";
         }
         return "DesktopEntry(" + desktopFile + ", " + parsed + ", " + name + ", " + noDisplay + ", {" + theCategories + "}, " + icon + ")";
+    }
+
+    @Override
+    public String toString()
+    {
+        return getName() + " (" + getDesktopFile().getName() + ")";
     }
 }
